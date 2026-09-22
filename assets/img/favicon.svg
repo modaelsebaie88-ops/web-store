@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="mawjat">
+  <rect width="64" height="64" rx="15" fill="#0B2135"/>
+  <path d="M22 34c0-11 4-17 10-17s10 6 10 17Z" fill="#EDDFC6"/>
+  <path d="M13 32c0 9 8 14 19 14s19-5 19-14c0-2-2-2.5-3.7-1.8C42 32.6 37 33.6 32 33.6s-10-1-14.3-3.4C16 29.5 13 30 13 32Z" fill="#DCC3A0"/>
+  <path d="M25 26q3.5-3 7 0t7 0" fill="none" stroke="#1F6A94" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M10 55q6-4.5 12 0t12 0 12 0" fill="none" stroke="#43A9A1" stroke-width="3.2" stroke-linecap="round"/>
+</svg>

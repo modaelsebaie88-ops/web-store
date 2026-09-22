@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Product — mawjat</title>
+<meta name="description" content="A mawjat bucket hat: cotton, salt and sun, cut and stitched on the Mediterranean coast.">
+<meta name="theme-color" content="#0B2135">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&display=swap">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="has-buybar">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="announce">
+  <div class="announce__track" aria-hidden="true">
+    <span>Free shipping over $80 <em>/</em> Cut &amp; sewn in Alexandria <em>/</em> 30-day returns <em>/</em> Numbered editions <em>/</em> New: Sunset Wave <em>/</em></span>
+    <span>Free shipping over $80 <em>/</em> Cut &amp; sewn in Alexandria <em>/</em> 30-day returns <em>/</em> Numbered editions <em>/</em> New: Sunset Wave <em>/</em></span>
+  </div>
+</div>
+
+<header class="header">
+  <div class="wrap wrap--wide header__inner">
+    <div class="header__left">
+      <button class="iconbtn header__burger" data-open="menu" aria-label="Open menu" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+      <nav class="nav" aria-label="Primary">
+        <a class="nav__link" href="shop.html">Shop</a>
+        <a class="nav__link" href="index.html#collections">Collections</a>
+        <a class="nav__link" href="index.html#story">Story</a>
+        <a class="nav__link" href="index.html#seen">Seen by the shore</a>
+      </nav>
+    </div>
+
+    <a class="header__logo" href="index.html" aria-label="mawjat — home">
+      <svg class="logo" viewBox="0 0 220 74" role="img" aria-label="mawjat">
+        <text x="110" y="44" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="42" font-weight="600" letter-spacing="-.5" fill="currentColor">mawjat</text>
+        <path d="M46,58 q16,-11 32,0 t32,0 t32,0 t32,0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <path d="M62,68 q14,-9 28,0 t28,0 t28,0" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" opacity=".55"/>
+      </svg>
+    </a>
+
+    <div class="header__right">
+      <div class="util" role="group" aria-label="Preferences">
+        <button class="util__btn" data-currency="USD">USD</button>
+        <button class="util__btn" data-currency="EGP">EGP</button>
+        <span class="util__sep" aria-hidden="true"></span>
+        <button class="iconbtn" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+      <button class="iconbtn" data-open="search" aria-label="Search" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <button class="iconbtn countbtn" data-open="wish" aria-label="Saved items" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-9.4A4.1 4.1 0 0 1 12 7.6a4.1 4.1 0 0 1 7.5 3C19.5 15.4 12 20 12 20Z"/></svg>
+        <span class="countbtn__n" data-count="wish">0</span>
+      </button>
+      <button class="iconbtn countbtn" data-open="cart" aria-label="Shopping bag" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="countbtn__n" data-count="cart">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap wrap--wide">
+    <div class="phead" style="padding-bottom:1rem">
+      <nav class="crumbs" aria-label="Breadcrumb" id="crumbs"></nav>
+    </div>
+
+    <!-- =============================================================== pdp -->
+    <div class="pdp" id="pdp">
+      <div class="gallery">
+        <div class="gallery__main" id="gallery-main"></div>
+        <div class="gallery__thumbs" id="gallery-thumbs" role="group" aria-label="Product images"></div>
+      </div>
+      <div class="pinfo" id="pinfo"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================= reviews -->
+  <section class="section" aria-labelledby="rev-t">
+    <div class="wrap wrap--wide">
+      <header class="sect-head">
+        <div class="sect-head__top">
+          <p class="eyebrow">Reviews</p>
+          <h2 class="d3" id="rev-t">What people say</h2>
+        </div>
+      </header>
+      <div class="revwrap">
+        <div class="revsum" id="rev-summary"></div>
+        <div class="revlist" id="rev-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= related -->
+  <section class="section band" aria-labelledby="rel-t">
+    <div class="wrap wrap--wide">
+      <header class="sect-head">
+        <div class="sect-head__top">
+          <p class="eyebrow">Pairs well with</p>
+          <h2 class="d3" id="rel-t">More from the coast</h2>
+        </div>
+        <div class="sect-head__aside">
+          <a class="tlink" href="shop.html">All 12 hats
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+        </div>
+      </header>
+      <div class="rail" id="related"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ====================================================== sticky buy bar -->
+<div class="buybar" id="buybar">
+  <div class="buybar__info">
+    <span class="buybar__name" id="bb-name"></span>
+    <span class="buybar__price" id="bb-price"></span>
+  </div>
+  <button class="btn" id="bb-add">Add to bag</button>
+</div>
+
+<footer class="footer">
+  <div class="wrap wrap--wide">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <svg class="logo" viewBox="0 0 220 74" role="img" aria-label="mawjat">
+          <text x="110" y="44" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="42" font-weight="600" letter-spacing="-.5" fill="currentColor">mawjat</text>
+          <path d="M46,58 q16,-11 32,0 t32,0 t32,0 t32,0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+          <path d="M62,68 q14,-9 28,0 t28,0 t28,0" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" opacity=".55"/>
+        </svg>
+        <p class="mute small">Bucket hats from where land meets the sea. Designed, dyed and stitched on the Mediterranean coast.</p>
+        <div class="social">
+          <a href="#" aria-label="mawjat on Instagram"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" aria-label="mawjat on TikTok"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4v10.2a3.8 3.8 0 1 1-3.2-3.76"/><path d="M15 4c.4 2.3 2 3.9 4.4 4.1"/></svg></a>
+          <a href="#" aria-label="mawjat on Pinterest"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M10 10.5h4"/></svg></a>
+        </div>
+      </div>
+      <nav class="footer__col" aria-labelledby="f-shop"><h3 id="f-shop">Shop</h3>
+        <ul>
+          <li><a href="shop.html">All hats</a></li>
+          <li><a href="shop.html?sort=new">New arrivals</a></li>
+          <li><a href="shop.html?sort=rating">Best rated</a></li>
+          <li><a href="shop.html?max=42">Under $42</a></li>
+          <li><a href="product.html?id=pharos-light">Numbered editions</a></li>
+        </ul>
+      </nav>
+      <nav class="footer__col" aria-labelledby="f-coll"><h3 id="f-coll">Collections</h3>
+        <ul>
+          <li><a href="shop.html?collection=ocean">Ocean</a></li>
+          <li><a href="shop.html?collection=coral">Coral</a></li>
+          <li><a href="shop.html?collection=sunset">Sunset</a></li>
+          <li><a href="shop.html?collection=tropical">Tropical</a></li>
+          <li><a href="shop.html?collection=minimal">Minimal Coast</a></li>
+        </ul>
+      </nav>
+      <nav class="footer__col" aria-labelledby="f-about"><h3 id="f-about">About &amp; contact</h3>
+        <ul>
+          <li><a href="index.html#story">Our story</a></li>
+          <li><a href="index.html#seen">Reviews</a></li>
+          <li><a href="mailto:hello@mawjat.com">hello@mawjat.com</a></li>
+          <li><a href="tel:+201200000000">+20 120 000 0000</a></li>
+          <li><a href="#">Shipping &amp; returns</a></li>
+          <li><a href="#">Size guide</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="footer__bar">
+      <p>&copy; <span id="year">2026</span> mawjat. All rights reserved.</p>
+      <ul>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Accessibility</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/art.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/product.js"></script>
+</body>
+</html>

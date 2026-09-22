@@ -1,0 +1,17 @@
+# Vercel
+.vercel
+
+# Dependencies (this project has none — the guard is for tooling you add later)
+node_modules/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*

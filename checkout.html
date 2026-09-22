@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checkout — mawjat</title>
+<meta name="description" content="Secure checkout. Free shipping over $80, 30-day returns.">
+<meta name="theme-color" content="#0B2135">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&display=swap">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="no-fab">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="header">
+  <div class="wrap wrap--wide header__inner">
+    <div class="header__left">
+      <a class="tlink" href="shop.html" style="font-size:var(--step--2)">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="transform:rotate(180deg)"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>
+        Keep shopping
+      </a>
+    </div>
+    <a class="header__logo" href="index.html" aria-label="mawjat — home">
+      <svg class="logo" viewBox="0 0 220 74" role="img" aria-label="mawjat">
+        <text x="110" y="44" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="42" font-weight="600" letter-spacing="-.5" fill="currentColor">mawjat</text>
+        <path d="M46,58 q16,-11 32,0 t32,0 t32,0 t32,0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <path d="M62,68 q14,-9 28,0 t28,0 t28,0" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" opacity=".55"/>
+      </svg>
+    </a>
+    <div class="header__right">
+      <div class="util" role="group" aria-label="Preferences">
+        <button class="util__btn" data-currency="USD">USD</button>
+        <button class="util__btn" data-currency="EGP">EGP</button>
+        <span class="util__sep" aria-hidden="true"></span>
+        <button class="iconbtn" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+      <span class="tag tag--sea nowrap">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.3-2.9 8.2-7 10-4.1-1.8-7-5.7-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+        Secure
+      </span>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="section section--tight">
+  <div class="wrap wrap--wide">
+
+    <!-- ============================================================ empty -->
+    <div id="co-empty" hidden>
+      <div class="empty">
+        <p class="d2">Your bag is empty.</p>
+        <p class="mute">There is no checking out of an empty bag. There is, however, a shop.</p>
+        <a class="btn" href="shop.html">Shop hats</a>
+      </div>
+    </div>
+
+    <!-- ============================================================= flow -->
+    <div id="co-flow" hidden>
+      <div class="phead" style="padding-top:0">
+        <h1 class="d2">Checkout</h1>
+      </div>
+
+      <div class="co">
+        <div>
+          <ol class="steps" id="steps" aria-label="Checkout progress">
+            <li class="step is-on" data-step="1"><span class="step__n">1</span> Information</li>
+            <li class="step__sep" role="presentation"></li>
+            <li class="step" data-step="2"><span class="step__n">2</span> Shipping</li>
+            <li class="step__sep" role="presentation"></li>
+            <li class="step" data-step="3"><span class="step__n">3</span> Payment</li>
+          </ol>
+
+          <form id="co-form" novalidate>
+
+            <!-- ---------------------------------------------- 1. contact -->
+            <section class="cosection" data-panel="1" aria-labelledby="s1">
+              <h2 class="d4" id="s1">Where is it going?</h2>
+
+              <div class="field">
+                <label class="field__label" for="email">Email</label>
+                <input class="input" type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+                <p class="field__error" data-error-for="email"></p>
+              </div>
+
+              <div class="cogrid cogrid--2">
+                <div class="field">
+                  <label class="field__label" for="first">First name</label>
+                  <input class="input" type="text" id="first" name="first" autocomplete="given-name" required>
+                  <p class="field__error" data-error-for="first"></p>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="last">Last name</label>
+                  <input class="input" type="text" id="last" name="last" autocomplete="family-name" required>
+                  <p class="field__error" data-error-for="last"></p>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="address">Address</label>
+                <input class="input" type="text" id="address" name="address" autocomplete="street-address" required>
+                <p class="field__error" data-error-for="address"></p>
+              </div>
+
+              <div class="cogrid cogrid--3">
+                <div class="field">
+                  <label class="field__label" for="city">City</label>
+                  <input class="input" type="text" id="city" name="city" autocomplete="address-level2" required>
+                  <p class="field__error" data-error-for="city"></p>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="postal">Postcode</label>
+                  <input class="input" type="text" id="postal" name="postal" autocomplete="postal-code" required>
+                  <p class="field__error" data-error-for="postal"></p>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="country">Country</label>
+                  <select class="select" id="country" name="country" autocomplete="country-name">
+                    <option>Egypt</option>
+                    <option>United Kingdom</option>
+                    <option>France</option>
+                    <option>Germany</option>
+                    <option>Italy</option>
+                    <option>Greece</option>
+                    <option>Cyprus</option>
+                    <option>United States</option>
+                    <option>United Arab Emirates</option>
+                    <option>Saudi Arabia</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="phone">Phone <span style="text-transform:none;letter-spacing:0">(for the courier)</span></label>
+                <input class="input" type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+20 120 000 0000">
+                <p class="field__error" data-error-for="phone"></p>
+              </div>
+
+              <div class="conav">
+                <button class="btn" type="button" data-next="2">Continue to shipping</button>
+                <a class="tlink" href="shop.html">Back to shop</a>
+              </div>
+            </section>
+
+            <!-- --------------------------------------------- 2. shipping -->
+            <section class="cosection" data-panel="2" aria-labelledby="s2" hidden>
+              <h2 class="d4" id="s2">How fast?</h2>
+              <div class="stack" role="radiogroup" aria-labelledby="s2">
+                <label class="radiocard">
+                  <input type="radio" name="ship" value="standard" data-rate="0" checked>
+                  <span class="radiocard__dot" aria-hidden="true"></span>
+                  <span class="radiocard__body">
+                    <span class="radiocard__t"><span>Standard</span><span data-ship-price="0">Free</span></span>
+                    <span class="radiocard__s">5–10 working days, tracked</span>
+                  </span>
+                </label>
+                <label class="radiocard">
+                  <input type="radio" name="ship" value="express" data-rate="12">
+                  <span class="radiocard__dot" aria-hidden="true"></span>
+                  <span class="radiocard__body">
+                    <span class="radiocard__t"><span>Express</span><span data-ship-price="12">$12</span></span>
+                    <span class="radiocard__s">2–4 working days, tracked and signed</span>
+                  </span>
+                </label>
+                <label class="radiocard">
+                  <input type="radio" name="ship" value="local" data-rate="4">
+                  <span class="radiocard__dot" aria-hidden="true"></span>
+                  <span class="radiocard__body">
+                    <span class="radiocard__t"><span>Alexandria same-day</span><span data-ship-price="4">$4</span></span>
+                    <span class="radiocard__s">Ordered before 2pm, on your door by evening</span>
+                  </span>
+                </label>
+              </div>
+
+              <label class="radiocard" style="margin-top:.4rem">
+                <input type="checkbox" id="giftbox">
+                <span class="radiocard__dot" aria-hidden="true"></span>
+                <span class="radiocard__body">
+                  <span class="radiocard__t"><span>Add the gift box</span><span>Free</span></span>
+                  <span class="radiocard__s">Printed sleeve, tissue, a hand-written card and a sticker sheet</span>
+                </span>
+              </label>
+
+              <div class="conav">
+                <button class="btn" type="button" data-next="3">Continue to payment</button>
+                <button class="tlink" type="button" data-back="1">Back to information</button>
+              </div>
+            </section>
+
+            <!-- ---------------------------------------------- 3. payment -->
+            <section class="cosection" data-panel="3" aria-labelledby="s3" hidden>
+              <h2 class="d4" id="s3">Payment</h2>
+              <p class="small mute">This is a demo storefront — no card is charged and nothing is sent anywhere.</p>
+
+              <div class="field">
+                <label class="field__label" for="card">Card number</label>
+                <input class="input" type="text" id="card" name="card" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" required>
+                <p class="field__error" data-error-for="card"></p>
+              </div>
+
+              <div class="cogrid cogrid--2">
+                <div class="field">
+                  <label class="field__label" for="exp">Expiry</label>
+                  <input class="input" type="text" id="exp" name="exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" required>
+                  <p class="field__error" data-error-for="exp"></p>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="cvc">CVC</label>
+                  <input class="input" type="text" id="cvc" name="cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" required>
+                  <p class="field__error" data-error-for="cvc"></p>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="cardname">Name on card</label>
+                <input class="input" type="text" id="cardname" name="cardname" autocomplete="cc-name" required>
+                <p class="field__error" data-error-for="cardname"></p>
+              </div>
+
+              <div class="conav">
+                <button class="btn btn--coral" type="submit" id="place">Place order &middot; <span id="place-total">—</span></button>
+                <button class="tlink" type="button" data-back="2">Back to shipping</button>
+              </div>
+            </section>
+          </form>
+        </div>
+
+        <!-- ------------------------------------------------ order summary -->
+        <aside class="summary" aria-label="Order summary">
+          <h2 class="d4">Your order</h2>
+          <div class="summary__lines" id="co-lines"></div>
+          <div class="promo">
+            <label class="sr" for="promo">Discount code</label>
+            <input class="input" type="text" id="promo" placeholder="Discount code" autocomplete="off">
+            <button class="btn btn--ghost btn--sm" type="button" id="promo-apply">Apply</button>
+          </div>
+          <p class="small" id="promo-msg" role="status"></p>
+          <div class="totals" id="co-totals"></div>
+          <p class="small mute">Prices in <span id="cur-note">USD</span>. Taxes estimated at 7%.</p>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ===================================================== confirmation -->
+    <div id="co-done" hidden>
+      <div class="done">
+        <div class="done__ring">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg>
+        </div>
+        <p class="eyebrow eyebrow--plain">Order confirmed</p>
+        <h1 class="d2">See you at the water.</h1>
+        <p class="lede" id="done-msg"></p>
+        <div class="done__box" id="done-box"></div>
+        <div class="cluster" style="justify-content:center">
+          <a class="btn" href="shop.html">Keep shopping</a>
+          <a class="tlink" href="index.html">Back home
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap wrap--wide">
+    <div class="footer__bar" style="border-top:0">
+      <p>&copy; <span id="year">2026</span> mawjat. All rights reserved.</p>
+      <ul>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Accessibility</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/art.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/checkout.js"></script>
+</body>
+</html>
