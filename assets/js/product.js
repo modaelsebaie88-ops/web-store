@@ -80,7 +80,7 @@
       '</div>',
 
       '<div class="trust">',
-        '<p class="trust__row">' + UI.icon('truck') + '<span>Free worldwide shipping over ' + M.money(80) + ' &middot; 3–7 working days</span></p>',
+        '<p class="trust__row">' + UI.icon('truck') + '<span>Free standard shipping, tax included &middot; 3–7 working days</span></p>',
         '<p class="trust__row">' + UI.icon('refresh') + '<span>30-day returns, no questions, return label included</span></p>',
         '<p class="trust__row">' + UI.icon('shield') + '<span>Two-year stitching guarantee on every hat</span></p>',
       '</div>',
@@ -98,7 +98,7 @@
           '<ul><li><span>Egypt: 1–3 working days</span></li>' +
           '<li><span>Europe &amp; Middle East: 3–6 working days</span></li>' +
           '<li><span>Rest of world: 5–10 working days</span></li>' +
-          '<li><span>Free over ' + M.money(80) + '. Flat ' + M.money(6) + ' below that.</span></li></ul>'),
+          '<li><span>Standard shipping is free on every order; prices include tax.</span></li></ul>'),
       '</div>'
     ].join('');
   }

@@ -112,7 +112,6 @@
         ? '<div class="totals__row totals__row--save"><span>Discount (' + esc(t.promoCode) + ')</span><span class="num">−' + M.money(t.discount) + '</span></div>'
         : '',
       '<div class="totals__row"><span>Shipping</span><span class="num">' + (t.shipping === 0 ? 'Free' : M.money(t.shipping)) + '</span></div>',
-      '<div class="totals__row"><span>Estimated tax</span><span class="num">' + M.money(t.tax) + '</span></div>',
       '<div class="totals__row totals__row--big"><span>Total</span><span class="num">' + M.money(t.total) + '</span></div>'
     ].join('');
     var pt = qs('#place-total');

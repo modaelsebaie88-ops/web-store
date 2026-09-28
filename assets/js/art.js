@@ -77,6 +77,38 @@
       '<filter id="mw-glow" x="-70%" y="-70%" width="240%" height="240%">',
         '<feGaussianBlur stdDeviation="26"/>',
       '</filter>',
+      '<filter id="mw-crease" x="-30%" y="-30%" width="160%" height="160%">',
+        '<feGaussianBlur stdDeviation="3.5"/>',
+      '</filter>',
+      '<filter id="mw-lift" x="-20%" y="-20%" width="140%" height="140%">',
+        '<feGaussianBlur stdDeviation="1.6"/>',
+      '</filter>',
+      // cotton twill: a fibrous bump map lit from the upper left, multiplied
+      // into whatever it is applied to. k1 = 1 / sin(elevation) keeps the
+      // average brightness unchanged.
+      '<filter id="mw-cloth" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">',
+        '<feTurbulence type="fractalNoise" baseFrequency=".62 .3" numOctaves="2" seed="4" result="n"/>',
+        '<feDiffuseLighting in="n" surfaceScale="1.1" lighting-color="#fff" result="l">',
+          '<feDistantLight azimuth="225" elevation="58"/>',
+        '</feDiffuseLighting>',
+        '<feComposite in="SourceGraphic" in2="l" operator="arithmetic" k1="1.18" k2="0" k3="0" k4="0"/>',
+      '</filter>',
+      // garment-wash mottling: faded patches (white) and dye pooling (black)
+      '<filter id="mw-wash" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">',
+        '<feTurbulence type="fractalNoise" baseFrequency=".007 .013" numOctaves="3" seed="11" result="n"/>',
+        '<feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  3 0 0 0 -1.6" result="hi"/>',
+        '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 -3 0 0 1.35" result="lo"/>',
+        '<feMerge><feMergeNode in="lo"/><feMergeNode in="hi"/></feMerge>',
+      '</filter>',
+      // satin-stitch direction and a domed sheen for the embroidered patch
+      '<pattern id="mw-satin" width="2.2" height="2.2" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">',
+        '<line x1="0" y1="0" x2="0" y2="2.2" stroke="#fff" stroke-width=".7" opacity=".2"/>',
+      '</pattern>',
+      '<radialGradient id="mw-sheen" cx=".36" cy=".3" r=".8">',
+        '<stop offset="0" stop-color="#fff" stop-opacity=".3"/>',
+        '<stop offset=".55" stop-color="#fff" stop-opacity="0"/>',
+        '<stop offset="1" stop-color="#000" stop-opacity=".16"/>',
+      '</radialGradient>',
       '</defs>'
     ].join('');
     (document.body || document.documentElement).appendChild(svg);
@@ -84,16 +116,64 @@
 
   /* ------------------------------------------------------------- the hat */
 
-  /* A bucket hat is a short truncated cone sitting on a brim that falls away
-     on every side. Keep the crown sides nearly straight — curve them and it
-     reads as a cloche — and keep the brim tips below the crown base, or the
-     whole thing reads as a bonnet. */
-  var CROWN = 'M170,344 C176,280 186,214 196,182 C204,154 232,148 254,148 ' +
-              'L346,148 C368,148 396,154 404,182 C414,214 424,280 430,344 Z';
-  var BRIM  = 'M90,352 C90,398 172,428 300,428 C428,428 510,398 510,352 ' +
-              'C510,338 490,341 468,348 C416,361 358,366 300,366 ' +
-              'C242,366 184,361 132,348 C110,341 90,338 90,352 Z';
-  var BRIM_EDGE = 'M90,352 C90,398 172,428 300,428 C428,428 510,398 510,352';
+  /* Product-shot view: three-quarter front with the camera slightly above,
+     the way the hats sit in the lookbook photos. The crown top reads as an
+     ellipse, the brim slopes away on every side and its back edge shows past
+     the crown. Keep the crown sides nearly straight — curve them and it reads
+     as a cloche. Seams and brim stitch rows all derive from the crown base
+     and brim edge ellipses so they stay concentric. */
+  var TOP  = { cx: 300, cy: 168, rx: 112, ry: 26 };
+  var BASE = { cx: 300, cy: 300, rx: 140, ry: 40 };
+  var RIM  = { cx: 300, cy: 360, rx: 250, ry: 70 };
+
+  var CROWN = 'M188,168 C179,204 164,256 160,300 A140,40 0 0 0 440,300 ' +
+              'C436,256 421,204 412,168 A112,26 0 0 1 188,168 Z';
+  var TOP_ELLIPSE = '<ellipse cx="' + TOP.cx + '" cy="' + TOP.cy + '" rx="' + TOP.rx + '" ry="' + TOP.ry + '"/>';
+
+  function num(n) { return Math.round(n * 10) / 10; }
+
+  /** Closed Catmull-Rom spline through `pts`, written as cubic Béziers. */
+  function smooth(pts) {
+    var n = pts.length, d = 'M' + num(pts[0][0]) + ',' + num(pts[0][1]);
+    for (var i = 0; i < n; i++) {
+      var a = pts[(i + n - 1) % n], b = pts[i], e = pts[(i + 1) % n], g = pts[(i + 2) % n];
+      d += 'C' + num(b[0] + (e[0] - a[0]) / 6) + ',' + num(b[1] + (e[1] - a[1]) / 6) +
+           ' ' + num(e[0] - (g[0] - b[0]) / 6) + ',' + num(e[1] - (g[1] - b[1]) / 6) +
+           ' ' + num(e[0]) + ',' + num(e[1]);
+    }
+    return d + 'Z';
+  }
+
+  /**
+   * A ring on the brim: k = 0 is the crown seam, k = 1 the outer edge. The
+   * brim droops a little more at the sides and carries a soft ripple that
+   * grows toward the edge, so no brim is a perfect ellipse and no two
+   * colourways ripple the same way.
+   */
+  function brimRing(k, seed) {
+    var pts = [];
+    for (var i = 0; i < 32; i++) {
+      var t = i / 32 * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+      var ripple = k * k * (2.6 * Math.sin(t * 5 + seed) + 1.7 * Math.sin(t * 3 + seed * 1.7));
+      pts.push([
+        BASE.cx + (BASE.rx + (RIM.rx - BASE.rx) * k + ripple) * c,
+        BASE.cy + (RIM.cy - BASE.cy) * k + (BASE.ry + (RIM.ry - BASE.ry) * k) * s + 22 * k * c * c + ripple * 0.5
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  function seedOf(str) {
+    var h = 0;
+    for (var i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 997;
+    return h / 97;
+  }
+
+  /** Tonal topstitch: a shade off the fabric, nudged toward the binding colour. */
+  function threadFor(base, binding) {
+    var t = U.luma(base) < 0.06 ? mix(base, '#ffffff', 0.24) : shade(base, -0.3);
+    return mix(t, binding || t, 0.2);
+  }
 
   function motif(kind, c, id) {
     var out = [];
@@ -243,34 +323,73 @@
     return out.join('');
   }
 
-  function patchMark(c, kind) {
-    if (kind === 'circle') {
-      var ink = c.motif;
-      return '<g transform="translate(300,238)">' +
-        '<circle r="54" fill="' + mix(c.crown, '#ffffff', 0.12) + '" stroke="' + ink + '" stroke-width="2.5"/>' +
-        '<circle r="46" fill="none" stroke="' + ink + '" stroke-width="1" opacity=".6"/>' +
-        '<path d="M-11,20 L-8,-8 L8,-8 L11,20 Z" fill="' + ink + '"/>' +
-        '<rect x="-10" y="-16" width="20" height="9" rx="2" fill="' + ink + '"/>' +
-        '<path d="M-7,-16 L0,-27 L7,-16 Z" fill="' + ink + '"/>' +
-        '<path d="M-32,28 q11,-7 22,0 t22,0 t22,0" fill="none" stroke="' + ink + '" stroke-width="3.4" stroke-linecap="round"/>' +
-        '<text y="-30" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="15" ' +
-          'letter-spacing="1.4" fill="' + ink + '">mawjat</text>' +
-        '</g>';
-    }
-    if (kind === 'tag') {
-      return '<g transform="translate(300,306)">' +
-        '<rect x="-38" y="-13" width="76" height="26" rx="5" fill="' + mix(c.crown, c.motif, 0.88) + '"/>' +
-        '<path d="M-24,4 q8,-6 16,0 t16,0" fill="none" stroke="' + c.crown + '" stroke-width="2.6" stroke-linecap="round"/>' +
-        '<text y="-1" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="12.5" ' +
-          'letter-spacing=".6" fill="' + c.crown + '">mawjat</text>' +
-        '</g>';
-    }
-    return '';
+  /* The embroidered roundel from the lookbook: hat icon, wordmark, the
+     lighthouse on the breakwater and a sun going down behind the sea. It is
+     the same patch on every colourway, as on the real hats. */
+  var PATCH = { ink: '#1D3050', cream: '#EFE4CB', sea: '#23426A', sun: '#DE9A45' };
+
+  function badge(id, r) {
+    var P = PATCH;
+    var inner = r - 4;
+    return [
+      '<g class="hat__patch" transform="translate(300,266)">',
+        '<clipPath id="pc' + id + '"><circle r="' + (inner - 1) + '"/></clipPath>',
+        // the patch sits proud of the crown
+        '<circle r="' + (r + 1.5) + '" cy="2.6" fill="#000" opacity=".42" filter="url(#mw-lift)"/>',
+        '<circle r="' + inner + '" fill="' + P.cream + '"/>',
+        '<g clip-path="url(#pc' + id + ')">',
+          '<circle cx="31" cy="25" r="9" fill="' + P.sun + '"/>',
+          '<g fill="' + P.ink + '">',
+            '<path d="M-45,26 L-43.5,6 L-38.5,6 L-37,26 Z"/>',
+            '<rect x="-45.5" y="2" width="8" height="4" rx="1"/>',
+            '<path d="M-44,2 L-41,-3 L-38,2 Z"/>',
+            '<path d="M-53,27 L-29,27 L-31,23 L-51,23 Z"/>',
+          '</g>',
+          '<path d="M-60,26 q7.5,-4 15,0 t15,0 t15,0 t15,0 t15,0 t15,0 t15,0 t15,0 L60,60 L-60,60 Z" fill="' + P.sea + '"/>',
+          '<g fill="none" stroke="' + P.cream + '" stroke-width="1.4" stroke-linecap="round" opacity=".85">',
+            '<path d="M-30,34 q5,-3 10,0 t10,0 t10,0 t10,0 t10,0 t10,0"/>',
+            '<path d="M-18,42 q5,-3 10,0 t10,0 t10,0 t10,0"/>',
+          '</g>',
+          '</g>',
+        '<g fill="none" stroke="' + P.ink + '" stroke-width="1.1" stroke-linecap="round">',
+          '<path d="M19,-30 q2,-2.2 4,0 q2,-2.2 4,0"/><path d="M28,-36 q1.6,-1.8 3.2,0 q1.6,-1.8 3.2,0"/>',
+        '</g>',
+        '<g fill="' + P.ink + '">',
+          '<path d="M-8,-27 C-7.5,-34 -6,-38 -4,-39 L4,-39 C6,-38 7.5,-34 8,-27 Z"/>',
+          '<path d="M-15,-27.5 C-15,-23 -8,-21 0,-21 C8,-21 15,-23 15,-27.5 C9,-25.8 -9,-25.8 -15,-27.5 Z"/>',
+        '</g>',
+        '<path d="M-5,-32 q2.5,-2 5,0 t5,0" fill="none" stroke="' + P.cream + '" stroke-width="1.2" stroke-linecap="round"/>',
+        '<text y="3" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="17" font-weight="700" ',
+          'fill="' + P.ink + '">mawjat</text>',
+        '<text y="12.5" text-anchor="middle" font-family="DM Sans, Helvetica, Arial, sans-serif" font-size="5.2" ',
+          'font-weight="600" letter-spacing="1.5" fill="' + P.ink + '">BUCKET HATS</text>',
+        '<circle r="' + inner + '" fill="url(#mw-satin)"/>',
+        '<circle r="' + inner + '" fill="url(#mw-sheen)"/>',
+        // merrowed edge: a thick overlocked border with visible thread wraps
+        '<circle r="' + (r - 1.5) + '" fill="none" stroke="' + P.ink + '" stroke-width="6"/>',
+        '<circle r="' + (r - 1.5) + '" fill="none" stroke="' + mix(P.ink, '#ffffff', 0.32) + '" stroke-width="5" ',
+          'stroke-dasharray=".9 1.4" opacity=".7"/>',
+        '<circle r="' + (r - 8) + '" fill="none" stroke="' + P.ink + '" stroke-width="1" opacity=".75"/>',
+      '</g>'
+    ].join('');
+  }
+
+  /** Metal side eyelet, foreshortened because it sits on the curve of the crown. */
+  function eyelet(x, y, c) {
+    var metal = mix(shade(c.crown, -0.42), '#8C8B86', 0.3);
+    return '<g transform="translate(' + x + ',' + y + ')">' +
+      '<ellipse cy="1.2" rx="6.6" ry="8" fill="#000" opacity=".22"/>' +
+      '<ellipse rx="5.6" ry="7" fill="' + metal + '"/>' +
+      '<path d="M-4.6,-3.2 A5.6,7 0 0 1 1.2,-6.9" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round" opacity=".4"/>' +
+      '<ellipse rx="2.6" ry="3.6" fill="' + shade(c.crown, -0.82) + '"/>' +
+      '</g>';
   }
 
   /**
    * Front product render.
-   * opts: { tilt, backdrop, shadow, scale }
+   * patch: 'none' leaves the crown bare (used for small thumbnails);
+   * anything else stitches on the roundel.
+   * opts: { tilt, shadow }
    */
   function hat(colorway, kind, patch, opts) {
     injectDefs();
@@ -278,85 +397,135 @@
     var c = colorway;
     var id = uid('h');
     var tilt = opts.tilt || 0;
+    var seed = seedOf(c.id || c.crown);
 
-    var crownTop = mix(c.crown, '#ffffff', 0.16);
-    var crownBot = shade(c.crown, -0.22);
-    var brimTop = shade(c.brim, -0.3);
-    var brimBot = mix(c.brim, '#ffffff', 0.08);
+    var crownHi = mix(c.crown, '#ffffff', 0.2);
+    var crownLo = shade(c.crown, -0.32);
+    var brimLo = shade(c.brim, -0.36);
+    var brimThread = threadFor(c.brim, c.binding);
+    var crownThread = threadFor(c.crown, c.binding);
+
+    var rows = '', ridges = '';
+    for (var i = 0; i < 8; i++) {
+      rows += brimRing(0.1 + i * 0.11, seed);
+      ridges += brimRing(0.155 + i * 0.11, seed);
+    }
+    rows += brimRing(0.95, seed);
+
+    // tone-on-tone: the print reads as dyed into the cloth, not sat on top
+    var print = '<g opacity=".55">' + motif(kind, c, id) + '</g>';
 
     return [
       '<svg class="hat" viewBox="0 0 600 500" role="img" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet">',
       '<defs>',
-        '<linearGradient id="cr' + id + '" x1="0" y1="0" x2=".85" y2="1">',
-          '<stop offset="0" stop-color="' + crownTop + '"/>',
-          '<stop offset=".48" stop-color="' + c.crown + '"/>',
-          '<stop offset="1" stop-color="' + crownBot + '"/>',
+        '<path id="rim' + id + '" d="' + brimRing(1, seed) + '"/>',
+        '<path id="crn' + id + '" d="' + CROWN + '"/>',
+        '<path id="row' + id + '" d="' + rows + '"/>',
+        '<path id="rdg' + id + '" d="' + ridges + '"/>',
+        '<linearGradient id="cs' + id + '" x1="0" y1="0" x2="1" y2="0">',
+          '<stop offset="0" stop-color="' + crownLo + '"/>',
+          '<stop offset=".16" stop-color="' + shade(c.crown, -0.1) + '"/>',
+          '<stop offset=".34" stop-color="' + crownHi + '"/>',
+          '<stop offset=".56" stop-color="' + c.crown + '"/>',
+          '<stop offset=".84" stop-color="' + shade(c.crown, -0.16) + '"/>',
+          '<stop offset="1" stop-color="' + crownLo + '"/>',
         '</linearGradient>',
-        '<linearGradient id="br' + id + '" x1=".1" y1="0" x2=".9" y2="1">',
-          '<stop offset="0" stop-color="' + brimTop + '"/>',
-          '<stop offset=".42" stop-color="' + c.brim + '"/>',
-          '<stop offset="1" stop-color="' + brimBot + '"/>',
+        '<linearGradient id="cv' + id + '" x1="0" y1="0" x2="0" y2="1">',
+          '<stop offset="0" stop-color="#000" stop-opacity="0"/>',
+          '<stop offset=".22" stop-color="#000" stop-opacity=".1"/>',
+          '<stop offset=".34" stop-color="#000" stop-opacity="0"/>',
+          '<stop offset=".78" stop-color="#000" stop-opacity="0"/>',
+          '<stop offset="1" stop-color="#000" stop-opacity=".3"/>',
         '</linearGradient>',
-        '<radialGradient id="hl' + id + '" cx=".34" cy=".26" r=".55">',
-          '<stop offset="0" stop-color="#ffffff" stop-opacity=".42"/>',
-          '<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>',
+        '<radialGradient id="ct' + id + '" cx=".4" cy=".38" r=".7">',
+          '<stop offset="0" stop-color="' + mix(c.crown, '#ffffff', 0.28) + '"/>',
+          '<stop offset=".7" stop-color="' + mix(c.crown, '#ffffff', 0.12) + '"/>',
+          '<stop offset="1" stop-color="' + c.crown + '"/>',
         '</radialGradient>',
-        '<clipPath id="cc' + id + '"><path d="' + CROWN + '"/></clipPath>',
-        '<clipPath id="bc' + id + '"><path d="' + BRIM + '"/></clipPath>',
+        '<linearGradient id="bh' + id + '" x1="0" y1="0" x2="1" y2="0">',
+          '<stop offset="0" stop-color="' + mix(c.brim, '#ffffff', 0.12) + '"/>',
+          '<stop offset=".45" stop-color="' + c.brim + '"/>',
+          '<stop offset="1" stop-color="' + shade(c.brim, -0.24) + '"/>',
+        '</linearGradient>',
+        '<linearGradient id="bv' + id + '" x1="0" y1="0" x2="0" y2="1">',
+          '<stop offset="0" stop-color="#000" stop-opacity=".42"/>',
+          '<stop offset=".38" stop-color="#000" stop-opacity=".14"/>',
+          '<stop offset=".62" stop-color="#000" stop-opacity="0"/>',
+          '<stop offset="1" stop-color="#000" stop-opacity=".14"/>',
+        '</linearGradient>',
+        '<clipPath id="cc' + id + '"><use href="#crn' + id + '"/>' + TOP_ELLIPSE + '</clipPath>',
+        '<clipPath id="bc' + id + '"><use href="#rim' + id + '"/></clipPath>',
+        '<clipPath id="hc' + id + '"><use href="#rim' + id + '"/><use href="#crn' + id + '"/>' + TOP_ELLIPSE + '</clipPath>',
       '</defs>',
 
       '<g class="hat__g" transform="rotate(' + tilt + ' 300 300)">',
 
-        // cast shadow
+        // cast shadow, outside the cloth filter so it stays soft
         (opts.shadow === false ? '' :
-          '<ellipse cx="302" cy="436" rx="186" ry="18" fill="' + shade(c.crown, -0.72) +
-          '" opacity=".2" filter="url(#mw-soft)"/>'),
+          '<ellipse cx="306" cy="404" rx="258" ry="58" fill="' + shade(c.brim, -0.8) + '" opacity=".26" filter="url(#mw-soft)"/>' +
+          '<ellipse cx="300" cy="430" rx="200" ry="14" fill="' + shade(c.brim, -0.85) + '" opacity=".3" filter="url(#mw-soft-sm)"/>'),
 
-        // ---- crown
-        '<g clip-path="url(#cc' + id + ')">',
-          '<path d="' + CROWN + '" fill="url(#cr' + id + ')"/>',
-          motif(kind, c, id),
-          '<rect x="160" y="140" width="290" height="220" fill="url(#mw-weave)"/>',
-          '<path d="' + CROWN + '" fill="url(#hl' + id + ')"/>',
-          // shading where the brim throws back onto the crown
-          '<ellipse cx="300" cy="356" rx="172" ry="34" fill="' + shade(c.crown, -0.6) + '" opacity=".3" filter="url(#mw-soft-sm)"/>',
+        '<g filter="url(#mw-cloth)">',
+
+          // ---- brim: edge thickness first, then the top surface over it
+          '<use href="#rim' + id + '" fill="' + brimLo + '" transform="translate(0,5)"/>',
+          '<g clip-path="url(#bc' + id + ')">',
+            '<use href="#rim' + id + '" fill="' + c.brim + '"/>',
+            '<use href="#rim' + id + '" fill="url(#bh' + id + ')"/>',
+            (kind === 'palm' || kind === 'fronds'
+              ? '<g opacity=".35" transform="translate(0,86)">' + motif('palm', c, id) + '</g>' : ''),
+            '<rect x="40" y="270" width="520" height="180" fill="url(#mw-weave)"/>',
+            // quilted rows: a lit ridge between each pair of stitch lines
+            '<use href="#rdg' + id + '" fill="none" stroke="#fff" stroke-width="3.6" opacity=".07"/>',
+            '<use href="#row' + id + '" fill="none" stroke="#000" stroke-width="1.9" opacity=".2"/>',
+            '<use href="#row' + id + '" fill="none" stroke="' + brimThread + '" stroke-width="1.1" stroke-dasharray="3.4 1.8" opacity=".8"/>',
+            '<use href="#rim' + id + '" fill="url(#bv' + id + ')"/>',
+            // occlusion where the crown meets the brim, pushed right by the light
+            '<ellipse cx="318" cy="312" rx="166" ry="44" fill="' + shade(c.brim, -0.75) + '" opacity=".42" filter="url(#mw-soft-sm)"/>',
+          '</g>',
+          // washing fades the rolled edge first
+          '<use href="#rim' + id + '" fill="none" stroke="' + mix(c.brim, '#ffffff', 0.38) + '" stroke-width="2.4" opacity=".32"/>',
+
+          // ---- crown
+          '<g clip-path="url(#cc' + id + ')">',
+            '<use href="#crn' + id + '" fill="url(#cs' + id + ')"/>',
+            print,
+            '<use href="#crn' + id + '" fill="url(#cv' + id + ')"/>',
+            // soft folds in the side panel
+            '<g fill="none" stroke-linecap="round" filter="url(#mw-crease)">',
+              '<path d="M214,196 C209,232 206,266 209,300" stroke="#fff" stroke-width="10" opacity=".12"/>',
+              '<path d="M392,194 C398,232 402,268 398,304" stroke="#000" stroke-width="12" opacity=".14"/>',
+              '<path d="M172,288 C186,278 200,288 212,278" stroke="#000" stroke-width="5" opacity=".18"/>',
+              '<path d="M390,284 C404,292 416,280 430,290" stroke="#000" stroke-width="5" opacity=".16"/>',
+              '<path d="M189,180 A112,26 0 0 0 411,180" stroke="#000" stroke-width="9" opacity=".14"/>',
+            '</g>',
+            // top panel, domed toward the light
+            TOP_ELLIPSE.replace('/>', ' fill="url(#ct' + id + ')"/>'),
+            '<ellipse cx="282" cy="164" rx="58" ry="11" fill="#fff" opacity=".1" filter="url(#mw-crease)"/>',
+            '<rect x="150" y="136" width="300" height="214" fill="url(#mw-weave)"/>',
+            // top seam: faded ridge, the seam itself, then two rows of topstitch
+            '<path d="M188,170.5 A112,26 0 0 0 412,170.5" fill="none" stroke="' + mix(c.crown, '#ffffff', 0.4) + '" stroke-width="2.6" opacity=".3"/>',
+            '<path d="M188,168 A112,26 0 0 0 412,168" fill="none" stroke="' + shade(c.crown, -0.5) + '" stroke-width="1.5" opacity=".45"/>',
+            '<g fill="none" stroke="' + crownThread + '" stroke-width="1.1" stroke-dasharray="3.4 1.8" opacity=".8">',
+              '<path d="M186.5,175 A113.5,26 0 0 0 413.5,175"/>',
+              '<path d="M185,181 A115,26 0 0 0 415,181"/>',
+              '<path d="M165,291 A135,38 0 0 0 435,291"/>',
+            '</g>',
+          '</g>',
+          '<use href="#crn' + id + '" fill="none" stroke="' + shade(c.crown, -0.45) + '" stroke-width="1.2" opacity=".4"/>',
+
+          // garment-wash mottling over the whole hat, offset per colourway so
+          // the pattern never repeats hat to hat
+          '<g clip-path="url(#hc' + id + ')">',
+            '<rect x="' + num(seed * 40) + '" y="' + num(seed * 23) + '" width="600" height="500" ',
+              'transform="translate(' + num(-seed * 40) + ',' + num(-seed * 23) + ')" filter="url(#mw-wash)" opacity=".12"/>',
+          '</g>',
+
+          eyelet(203, 232, c),
+          eyelet(397, 232, c),
+
+          patch === 'none' ? '' : badge(id, 56),
         '</g>',
-        '<path d="' + CROWN + '" fill="none" stroke="' + shade(c.crown, -0.4) + '" stroke-width="1.6" opacity=".5"/>',
-
-        // crown top stitch
-        '<path d="M242,166 C268,156 332,156 358,166" fill="none" stroke="' + shade(c.crown, -0.45) +
-          '" stroke-width="1.6" stroke-dasharray="5 5" opacity=".55"/>',
-
-        patchMark(c, patch),
-
-        // eyelets
-        '<g>',
-          '<circle cx="204" cy="268" r="8" fill="' + shade(c.crown, -0.5) + '" opacity=".55"/>',
-          '<circle cx="204" cy="268" r="5" fill="' + shade(c.crown, -0.78) + '"/>',
-          '<circle cx="396" cy="268" r="8" fill="' + shade(c.crown, -0.5) + '" opacity=".55"/>',
-          '<circle cx="396" cy="268" r="5" fill="' + shade(c.crown, -0.78) + '"/>',
-        '</g>',
-
-        // ---- brim
-        '<g clip-path="url(#bc' + id + ')">',
-          '<path d="' + BRIM + '" fill="url(#br' + id + ')"/>',
-          '<rect x="76" y="336" width="450" height="110" fill="url(#mw-weave)"/>',
-          '<ellipse cx="300" cy="342" rx="204" ry="28" fill="' + shade(c.brim, -0.65) + '" opacity=".45" filter="url(#mw-soft-sm)"/>',
-          (kind === 'palm' || kind === 'fronds'
-            ? '<g opacity=".5" transform="translate(0,86)">' + motif('palm', c, id) + '</g>' : ''),
-        '</g>',
-
-        // brim topstitching
-        '<g fill="none" stroke="' + shade(c.brim, -0.46) + '" stroke-linecap="round" opacity=".5">',
-          '<path d="M106,358 C108,392 182,414 300,414 C418,414 492,392 494,358" stroke-width="1.5" stroke-dasharray="5 5"/>',
-          '<path d="M124,362 C130,384 196,402 300,402 C404,402 470,384 476,362" stroke-width="1.5" stroke-dasharray="5 5"/>',
-        '</g>',
-
-        // binding tape along the outer edge
-        '<path d="' + BRIM_EDGE + '" fill="none" ' +
-          'stroke="' + c.binding + '" stroke-width="7" stroke-linecap="round"/>',
-        '<path d="' + BRIM + '" fill="none" stroke="' + shade(c.brim, -0.45) + '" stroke-width="1.4" opacity=".45"/>',
-
       '</g>',
       '</svg>'
     ].join('');
@@ -366,6 +535,10 @@
   function flatLay(colorway, kind) {
     injectDefs();
     var c = colorway, id = uid('f');
+    var seed = seedOf(c.id || c.crown);
+    var brimThread = threadFor(c.brim, c.binding);
+    var rows = [];
+    for (var r = 124; r <= 176; r += 6.5) rows.push('<circle cx="300" cy="250" r="' + r + '"/>');
     return [
       '<svg class="hat hat--flat" viewBox="0 0 600 500" role="img" aria-hidden="true" focusable="false">',
       '<defs>',
@@ -378,43 +551,60 @@
           '<stop offset="1" stop-color="' + shade(c.brim, -0.26) + '"/>',
         '</radialGradient>',
         '<clipPath id="fc' + id + '"><circle cx="300" cy="250" r="112"/></clipPath>',
+        '<clipPath id="fo' + id + '"><circle cx="300" cy="250" r="182"/></clipPath>',
       '</defs>',
-      '<ellipse cx="304" cy="268" rx="186" ry="182" fill="' + shade(c.crown, -0.7) + '" opacity=".16" filter="url(#mw-soft)"/>',
-      '<circle cx="300" cy="250" r="182" fill="url(#fb' + id + ')"/>',
-      '<circle cx="300" cy="250" r="182" fill="url(#mw-weave)"/>',
-      '<circle cx="300" cy="250" r="178" fill="none" stroke="' + c.binding + '" stroke-width="7"/>',
-      '<g fill="none" stroke="' + shade(c.brim, -0.45) + '" stroke-width="1.4" stroke-dasharray="5 5" opacity=".5">',
-        '<circle cx="300" cy="250" r="166"/><circle cx="300" cy="250" r="152"/><circle cx="300" cy="250" r="138"/>',
+      '<ellipse cx="306" cy="268" rx="188" ry="184" fill="' + shade(c.crown, -0.75) + '" opacity=".22" filter="url(#mw-soft)"/>',
+      '<g filter="url(#mw-cloth)">',
+        '<circle cx="300" cy="250" r="182" fill="url(#fb' + id + ')"/>',
+        '<circle cx="300" cy="250" r="182" fill="url(#mw-weave)"/>',
+        '<g fill="none">',
+          '<g stroke="#000" stroke-width="1.9" opacity=".2">' + rows.join('') + '</g>',
+          '<g stroke="' + brimThread + '" stroke-width="1.1" stroke-dasharray="3.4 1.8" opacity=".8">' + rows.join('') + '</g>',
+        '</g>',
+        '<circle cx="300" cy="250" r="180" fill="none" stroke="' + mix(c.brim, '#ffffff', 0.38) + '" stroke-width="3" opacity=".3"/>',
+        '<circle cx="300" cy="250" r="116" fill="' + shade(c.crown, -0.6) + '" opacity=".4" filter="url(#mw-soft-sm)"/>',
+        '<g clip-path="url(#fc' + id + ')">',
+          '<circle cx="300" cy="250" r="112" fill="url(#fl' + id + ')"/>',
+          '<g opacity=".55" transform="translate(300,250) scale(.62) translate(-300,-240)">' + motif(kind, c, id) + '</g>',
+          '<circle cx="300" cy="250" r="112" fill="url(#mw-weave)"/>',
+          '<circle cx="300" cy="250" r="104" fill="none" stroke="' + threadFor(c.crown, c.binding) + '" stroke-width="1.1" stroke-dasharray="3.4 1.8" opacity=".8"/>',
+        '</g>',
+        '<circle cx="300" cy="250" r="112" fill="none" stroke="' + shade(c.crown, -0.45) + '" stroke-width="1.6" opacity=".6"/>',
+        '<g clip-path="url(#fo' + id + ')">',
+          '<rect x="' + num(seed * 40) + '" width="600" height="500" transform="translate(' + num(-seed * 40) + ',0)" filter="url(#mw-wash)" opacity=".12"/>',
+        '</g>',
+        eyelet(196, 276, c),
+        eyelet(404, 276, c),
       '</g>',
-      '<circle cx="300" cy="250" r="114" fill="' + shade(c.crown, -0.45) + '" opacity=".35" filter="url(#mw-soft-sm)"/>',
-      '<g clip-path="url(#fc' + id + ')">',
-        '<circle cx="300" cy="250" r="112" fill="url(#fl' + id + ')"/>',
-        '<g transform="translate(300,250) scale(.62) translate(-300,-240)">' + motif(kind, c, id) + '</g>',
-        '<circle cx="300" cy="250" r="112" fill="url(#mw-weave)"/>',
-      '</g>',
-      '<circle cx="300" cy="250" r="112" fill="none" stroke="' + shade(c.crown, -0.4) + '" stroke-width="1.6" opacity=".6"/>',
-      '<circle cx="197" cy="276" r="5" fill="' + shade(c.crown, -0.7) + '"/>',
-      '<circle cx="403" cy="276" r="5" fill="' + shade(c.crown, -0.7) + '"/>',
       '</svg>'
     ].join('');
   }
 
-  /** Close crop on the embroidery, used as a detail shot. */
+  /** Close crop on the embroidered patch, used as a detail shot. */
   function detailCrop(colorway, kind) {
     injectDefs();
     var c = colorway, id = uid('d');
+    var seed = seedOf(c.id || c.crown);
     return [
       '<svg class="hat hat--detail" viewBox="0 0 600 500" role="img" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">',
-      '<defs><linearGradient id="dg' + id + '" x1="0" y1="0" x2="1" y2="1">',
-        '<stop offset="0" stop-color="' + mix(c.crown, '#ffffff', 0.14) + '"/>',
-        '<stop offset="1" stop-color="' + shade(c.crown, -0.2) + '"/>',
+      '<defs><linearGradient id="dg' + id + '" x1="0" y1="0" x2="1" y2="0">',
+        '<stop offset="0" stop-color="' + shade(c.crown, -0.22) + '"/>',
+        '<stop offset=".35" stop-color="' + mix(c.crown, '#ffffff', 0.12) + '"/>',
+        '<stop offset=".7" stop-color="' + c.crown + '"/>',
+        '<stop offset="1" stop-color="' + shade(c.crown, -0.28) + '"/>',
       '</linearGradient></defs>',
-      '<rect width="600" height="500" fill="url(#dg' + id + ')"/>',
-      '<g transform="translate(300,250) scale(1.6) translate(-300,-250)">' + motif(kind, c, id) + '</g>',
-      '<rect width="600" height="500" fill="url(#mw-weave)"/>',
-      '<path d="M0,372 C120,362 200,384 300,378 C400,372 500,392 600,384" fill="none" ' +
-        'stroke="' + shade(c.crown, -0.45) + '" stroke-width="2" stroke-dasharray="7 7" opacity=".6"/>',
-      '<ellipse cx="300" cy="500" rx="420" ry="150" fill="' + shade(c.crown, -0.6) + '" opacity=".22" filter="url(#mw-soft)"/>',
+      '<g filter="url(#mw-cloth)">',
+        '<rect width="600" height="500" fill="url(#dg' + id + ')"/>',
+        '<g opacity=".4" transform="translate(300,250) scale(1.6) translate(-300,-250)">' + motif(kind, c, id) + '</g>',
+        '<rect width="600" height="500" fill="url(#mw-weave)"/>',
+        '<rect x="' + num(seed * 40) + '" width="600" height="500" transform="translate(' + num(-seed * 40) + ',0)" filter="url(#mw-wash)" opacity=".12"/>',
+        // crown-to-brim seam along the bottom of the frame
+        '<path d="M0,448 C160,432 440,432 600,448 L600,500 L0,500 Z" fill="' + shade(c.brim, -0.2) + '"/>',
+        '<path d="M0,448 C160,432 440,432 600,448" fill="none" stroke="' + shade(c.crown, -0.55) + '" stroke-width="2.4" opacity=".6"/>',
+        '<path d="M0,436 C160,420 440,420 600,436" fill="none" stroke="' + threadFor(c.crown, c.binding) + '" ',
+          'stroke-width="2.4" stroke-dasharray="8 4" opacity=".85"/>',
+        '<g transform="translate(300,228) scale(2.6) translate(-300,-266)">' + badge(id, 56) + '</g>',
+      '</g>',
       '</svg>'
     ].join('');
   }

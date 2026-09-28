@@ -32,6 +32,12 @@
     moss:       '#4E6A4C'
   };
 
+  /** Prices are stored in USD; this converts an EGP price into that base. */
+  function egp(amount) { return amount / M.currencies.EGP.rate; }
+
+  // Every hat sells at the same price.
+  var HAT_PRICE = egp(400);
+
   /** way(name, swatch, crown, brim, motif, binding) */
   function way(name, crown, brim, motif, binding) {
     return {
@@ -90,7 +96,7 @@
       id: 'ocean-blue',
       name: 'Ocean Blue',
       collection: 'ocean',
-      price: 42,
+      price: HAT_PRICE,
       motif: 'waves',
       patch: 'tag',
       badge: 'Bestseller',
@@ -118,7 +124,7 @@
       id: 'coral-reef',
       name: 'Coral Reef',
       collection: 'coral',
-      price: 46,
+      price: HAT_PRICE,
       motif: 'coral',
       patch: 'circle',
       badge: 'Limited',
@@ -146,7 +152,7 @@
       id: 'sandy-coast',
       name: 'Sandy Coast',
       collection: 'minimal',
-      price: 39,
+      price: HAT_PRICE,
       motif: 'minimal',
       patch: 'tag',
       badge: null,
@@ -174,7 +180,7 @@
       id: 'deep-sea',
       name: 'Deep Sea',
       collection: 'ocean',
-      price: 48,
+      price: HAT_PRICE,
       motif: 'fish',
       patch: 'circle',
       badge: null,
@@ -202,7 +208,7 @@
       id: 'sunset-wave',
       name: 'Sunset Wave',
       collection: 'sunset',
-      price: 46,
+      price: HAT_PRICE,
       motif: 'sunburst',
       patch: 'circle',
       badge: 'New',
@@ -230,7 +236,7 @@
       id: 'tropical-tide',
       name: 'Tropical Tide',
       collection: 'tropical',
-      price: 44,
+      price: HAT_PRICE,
       motif: 'palm',
       patch: 'tag',
       badge: null,
@@ -258,7 +264,7 @@
       id: 'pharos-light',
       name: 'Pharos Light',
       collection: 'minimal',
-      price: 52,
+      price: HAT_PRICE,
       motif: 'lighthouse',
       patch: 'circle',
       badge: 'Limited',
@@ -285,7 +291,7 @@
       id: 'corniche-stripe',
       name: 'Corniche Stripe',
       collection: 'ocean',
-      price: 44,
+      price: HAT_PRICE,
       motif: 'stripe',
       patch: 'tag',
       badge: null,
@@ -313,7 +319,7 @@
       id: 'shell-bay',
       name: 'Shell Bay',
       collection: 'coral',
-      price: 41,
+      price: HAT_PRICE,
       motif: 'shells',
       patch: 'tag',
       badge: null,
@@ -341,7 +347,7 @@
       id: 'mango-sunset',
       name: 'Mango Sunset',
       collection: 'sunset',
-      price: 45,
+      price: HAT_PRICE,
       motif: 'sunburst',
       patch: 'tag',
       badge: 'New',
@@ -369,7 +375,7 @@
       id: 'palm-hour',
       name: 'Palm Hour',
       collection: 'tropical',
-      price: 47,
+      price: HAT_PRICE,
       motif: 'fronds',
       patch: 'circle',
       badge: null,
@@ -397,7 +403,7 @@
       id: 'salt-and-rope',
       name: 'Salt & Rope',
       collection: 'minimal',
-      price: 49,
+      price: HAT_PRICE,
       motif: 'rope',
       patch: 'circle',
       badge: null,

@@ -157,6 +157,8 @@
           return checkbox(scope, 'size', s, s, countFor('size', s));
         }).join(''),
       '</div>',
+      // a price slider is meaningless when every hat costs the same
+      RANGE.min === RANGE.max ? '' : [
       '<div class="fgroup">',
         '<h2 class="fgroup__t">Max price</h2>',
         '<div class="range">',
@@ -164,7 +166,7 @@
           '<input type="range" id="' + scope + '-max" data-facet="max" min="' + RANGE.min + '" max="' + MAXP + '" step="1" value="' + state.max + '">',
           '<div class="range__val"><span>' + M.money(RANGE.min) + '</span><span data-maxout>' + M.money(state.max) + '</span></div>',
         '</div>',
-      '</div>'
+      '</div>'].join('')
     ].join('');
   }
 

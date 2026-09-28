@@ -67,7 +67,7 @@ Append to `PRODUCTS` in `assets/js/data.js`:
   id: 'north-swell',            // also the URL: product.html?id=north-swell
   name: 'North Swell',
   collection: 'ocean',          // ocean | coral | sunset | tropical | minimal
-  price: 45,                    // always USD; EGP is derived
+  price: HAT_PRICE,             // 400 EGP; stored as USD via egp()
   motif: 'waves',
   patch: 'tag',                 // 'tag' | 'circle' | 'none'
   badge: 'New',                 // or null

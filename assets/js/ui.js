@@ -226,7 +226,7 @@
             '<div class="totals__row totals__row--big"><span>Subtotal</span><span id="cart-sub" class="num">—</span></div>',
           '</div>',
           '<a class="btn btn--block" href="checkout.html">Checkout ' + icon('arrow', 'icon btn__arrow') + '</a>',
-          '<p class="small mute" style="text-align:center">Shipping and taxes calculated at checkout.</p>',
+          '<p class="small mute" style="text-align:center">Tax included. Free standard shipping.</p>',
         '</div>',
       '</aside>',
 
@@ -310,11 +310,8 @@
 
     var t = M.totals();
     qs('#cart-sub').textContent = M.money(t.subtotal);
-    var pct = Math.min(100, (t.subtotal / t.freeShippingAt) * 100);
-    qs('#ship-fill').style.width = pct + '%';
-    qs('#ship-txt').innerHTML = t.toFreeShipping > 0
-      ? 'You are <strong>' + M.money(t.toFreeShipping) + '</strong> from free shipping.'
-      : 'Free shipping unlocked.';
+    qs('#ship-fill').style.width = '100%';
+    qs('#ship-txt').innerHTML = 'Free standard shipping on every order.';
   }
 
   function wireCart() {

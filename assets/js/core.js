@@ -103,8 +103,8 @@ window.MAWJAT = window.MAWJAT || {};
     USD: { code: 'USD', symbol: '$', rate: 1, decimals: 2 },
     EGP: { code: 'EGP', symbol: 'EGP', rate: 48.6, decimals: 0 }
   };
-  var currencyCode = storage.get('mawjat.currency', 'USD');
-  if (!CURRENCIES[currencyCode]) currencyCode = 'USD';
+  var currencyCode = storage.get('mawjat.currency', 'EGP');
+  if (!CURRENCIES[currencyCode]) currencyCode = 'EGP';
 
   function currency() { return CURRENCIES[currencyCode]; }
 
@@ -219,24 +219,19 @@ window.MAWJAT = window.MAWJAT || {};
     SALT15: { type: 'percent', value: 0.15, label: '15% off your order' },
     FREESHIP: { type: 'shipping', value: 0, label: 'Free shipping' }
   };
-  var FREE_SHIPPING_AT = 80;
-
+  /* Prices are all-in: tax is included and standard shipping is free, so a
+     single hat checks out at exactly its sticker price. Only the optional
+     faster delivery methods add a shipping charge. */
   function totals(promoCode, shippingRate) {
     var subtotal = cart.subtotal();
     var promo = promoCode ? PROMOS[String(promoCode).toUpperCase()] : null;
     var discount = promo && promo.type === 'percent' ? subtotal * promo.value : 0;
-    var base = shippingRate == null
-      ? (subtotal >= FREE_SHIPPING_AT || subtotal === 0 ? 0 : 6)
-      : shippingRate;
+    var base = shippingRate == null ? 0 : shippingRate;
     var shipping = promo && promo.type === 'shipping' ? 0 : base;
-    var taxable = Math.max(0, subtotal - discount);
-    var tax = taxable * 0.07;
     return {
-      subtotal: subtotal, discount: discount, shipping: shipping, tax: tax,
-      total: Math.max(0, taxable + shipping + tax),
-      promo: promo, promoCode: promo ? String(promoCode).toUpperCase() : null,
-      freeShippingAt: FREE_SHIPPING_AT,
-      toFreeShipping: Math.max(0, FREE_SHIPPING_AT - subtotal)
+      subtotal: subtotal, discount: discount, shipping: shipping,
+      total: Math.max(0, subtotal - discount + shipping),
+      promo: promo, promoCode: promo ? String(promoCode).toUpperCase() : null
     };
   }
 
