@@ -36,7 +36,7 @@
   function egp(amount) { return amount / M.currencies.EGP.rate; }
 
   // Every hat sells at the same price.
-  var HAT_PRICE = egp(400);
+  var HAT_PRICE = egp(399);
 
   /** way(name, swatch, crown, brim, motif, binding) */
   function way(name, crown, brim, motif, binding) {
